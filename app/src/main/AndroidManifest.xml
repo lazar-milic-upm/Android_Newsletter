@@ -12,21 +12,26 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AndroidNewsletter"
         tools:targetApi="31">
-        <activity
-            android:name=".ModifiedArticlesActivity"
-            android:exported="false" />
+
+        <!-- Main launcher activity (LoginActivity) -->
         <activity
             android:name=".LoginActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ShowArticlesActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- ShowArticlesActivity -->
+        <activity
+            android:name=".ShowArticlesActivity"
+            android:exported="true" />
+
+        <!-- ModifiedArticlesActivity -->
+        <activity
+            android:name=".ModifiedArticlesActivity"
+            android:exported="false" />
     </application>
 
 </manifest>
