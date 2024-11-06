@@ -1,5 +1,6 @@
 package com.upm.androidnewsletter;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -62,7 +63,8 @@ public class LoginActivity extends AppCompatActivity {
                 // if Success
                 Toast.makeText(LoginActivity.this, "Login successful!", Toast.LENGTH_SHORT).show();
 
-                // startActivity(new Intent(LoginActivity.this, ShowArticlesActivity.class));
+                startActivity(new Intent(LoginActivity.this, ShowArticlesActivity.class));
+                finish();
             } else {
                 // if Error
                 Toast.makeText(LoginActivity.this, "Invalid credentials", Toast.LENGTH_SHORT).show();
