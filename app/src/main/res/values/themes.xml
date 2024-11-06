@@ -6,4 +6,7 @@
     </style>
 
     <style name="Theme.AndroidNewsletter" parent="Base.Theme.AndroidNewsletter" />
+    <declare-styleable name="Theme.AndroidNewsletter">
+        <attr name="ATTR_SERVICE_URL" format="string" />
+    </declare-styleable>
 </resources>

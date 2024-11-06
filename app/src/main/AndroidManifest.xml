@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="true"
@@ -15,7 +16,7 @@
 
         <!-- Main launcher activity (LoginActivity) -->
         <activity
-            android:name=".LoginActivity"
+            android:name=".activities.LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -25,13 +26,13 @@
 
         <!-- ShowArticlesActivity -->
         <activity
-            android:name=".ShowArticlesActivity"
+            android:name=".activities.ShowArticlesActivity"
             android:exported="true" />
 
         <!-- ModifiedArticlesActivity -->
         <activity
-            android:name=".ModifiedArticlesActivity"
+            android:name=".activities.ModifiedArticlesActivity"
             android:exported="false" />
-    </application>
 
+    </application>
 </manifest>
