@@ -38,6 +38,5 @@
         <activity
             android:name=".activities.ArticleDetailActivity"
             android:exported="false" />
-
     </application>
 </manifest>

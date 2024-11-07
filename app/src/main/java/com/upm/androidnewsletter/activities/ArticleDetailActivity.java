@@ -19,6 +19,7 @@ import com.upm.androidnewsletter.R;
 import com.upm.androidnewsletter.exceptions.ServerCommunicationError;
 import com.upm.androidnewsletter.model.Article;
 import com.upm.androidnewsletter.model.ModelManager;
+import com.upm.androidnewsletter.model.Utils;
 
 import java.io.IOException;
 
@@ -79,8 +80,7 @@ public class ArticleDetailActivity extends AppCompatActivity {
             Uri imageUri = data.getData();
             try {
                 Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
-                imageViewArticle.setImageBitmap(bitmap);
-                // Upload image to server
+                imageViewArticle.setImageBitmap(bitmap); // Display the selected image
                 new UploadImageTask().execute(bitmap);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -92,10 +92,16 @@ public class ArticleDetailActivity extends AppCompatActivity {
     private class UploadImageTask extends AsyncTask<Bitmap, Void, Boolean> {
         @Override
         protected Boolean doInBackground(Bitmap... bitmaps) {
-            // Convert bitmap to Base64 and upload using modelManager
-            // String base64Image = Utils.bitmapToBase64(bitmaps[0]);
-            // return modelManager.uploadImage(article.getId(), base64Image);
-            return true; // Placeholder
+            try {
+                // Convert bitmap to Base64
+                String base64Image = Utils.imgToBase64String(bitmaps[0]);
+                // Upload image using modelManager
+                modelManager.uploadImage(base64Image);
+                return true;
+            } catch (ServerCommunicationError e) {
+                e.printStackTrace();
+                return false;
+            }
         }
 
         @Override
