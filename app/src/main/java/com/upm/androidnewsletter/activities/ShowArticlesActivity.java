@@ -1,10 +1,13 @@
 package com.upm.androidnewsletter.activities;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -34,6 +37,22 @@ public class ShowArticlesActivity extends AppCompatActivity {
 
         modelManager = LoginActivity.getModelManager();
         listViewArticles = findViewById(R.id.listViewArticles);
+
+        listViewArticles.setOnItemClickListener((parent, view, position, id) -> {
+            // Get the clicked article
+            Article selectedArticle = articleAdapter.getItem(position);
+
+            // Create an intent to start the detail activity
+            Intent intent = new Intent(ShowArticlesActivity.this, ArticleDetailActivity.class);
+
+            if(selectedArticle != null) {
+                intent.putExtra("id", String.valueOf(selectedArticle.getId()));
+            }
+            else
+                System.out.println("PROBLEMI");
+
+            startActivity(intent);
+        });
 
         fetchArticlesIfConnected(); // Check network before fetching articles
     }

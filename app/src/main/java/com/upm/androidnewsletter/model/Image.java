@@ -1,5 +1,9 @@
 package com.upm.androidnewsletter.model;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.Base64;
+
 import java.util.Hashtable;
 
 import com.upm.androidnewsletter.model.json.JSONObject;
@@ -108,6 +112,12 @@ public class Image extends ModelEntity{
 	public String getImage(){
 		return image;
 	}
-	
 
+	public Bitmap getBitmapImage() {
+		// Decode the Base64 string to a byte array
+		byte[] decodedString = Base64.decode(this.getImage(), Base64.DEFAULT);
+
+		// Convert the byte array to a Bitmap
+		return BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+	}
 }

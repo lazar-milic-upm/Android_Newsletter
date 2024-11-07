@@ -16,6 +16,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.upm.androidnewsletter.R;
+import com.upm.androidnewsletter.exceptions.ServerCommunicationError;
 import com.upm.androidnewsletter.model.Article;
 import com.upm.androidnewsletter.model.ModelManager;
 
@@ -34,21 +35,17 @@ public class ArticleDetailActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_article_detail);
-
-        modelManager = LoginActivity.getModelManager();
-
         textViewTitle = findViewById(R.id.textViewTitle);
         textViewAbstract = findViewById(R.id.textViewAbstract);
         textViewBody = findViewById(R.id.textViewBody);
-        imageViewArticle = findViewById(R.id.imageViewArticle);
         buttonUploadImage = findViewById(R.id.buttonUploadImage);
-
-        // Retrieve the article from intent
+        imageViewArticle = findViewById(R.id.imageViewArticle);
         Intent intent = getIntent();
-        if (intent != null && intent.hasExtra("article")) {
-            article = (Article) intent.getSerializableExtra("article");
-            displayArticleDetails();
-        }
+        int articleId = Integer.parseInt(intent.getStringExtra("id"));
+
+        modelManager = LoginActivity.getModelManager();
+
+        new GetArticleTask().execute(articleId);
 
         buttonUploadImage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -107,6 +104,36 @@ public class ArticleDetailActivity extends AppCompatActivity {
                 Toast.makeText(ArticleDetailActivity.this, "Image uploaded successfully", Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(ArticleDetailActivity.this, "Image upload failed", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    private class GetArticleTask extends AsyncTask<Integer, Void, Article> {
+
+        @Override
+        protected Article doInBackground(Integer... params) {
+            int articleId = params[0];
+            try {
+                return modelManager.getArticle(articleId);
+            } catch (ServerCommunicationError e) {
+                // Handle the error, e.g., log it or display an error message
+                e.printStackTrace();
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Article article) {
+            if (article != null) {
+
+                textViewTitle.setText(article.getTitleText());
+                textViewAbstract.setText(article.getAbstractText());
+                textViewBody.setText(article.getBodyText());
+                try {
+                    imageViewArticle.setImageBitmap(article.getImage().getBitmapImage());
+                } catch (ServerCommunicationError e) {
+                    throw new RuntimeException(e);
+                }
             }
         }
     }

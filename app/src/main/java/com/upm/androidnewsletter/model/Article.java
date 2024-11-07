@@ -12,6 +12,7 @@ public class Article extends ModelEntity {
 	private String titleText, category, abstractText, bodyText, footerText, imageDescription, thumbnail;
 	private int idUser;
 	private Image mainImage;
+	protected String articleId;
 
 	private String parseStringFromJson(JSONObject jsonArticle, String key, String def){
 		Object in = jsonArticle.getOrDefault(key,def);
@@ -23,6 +24,7 @@ public class Article extends ModelEntity {
 		super(mm);
 		try{
 			id = Integer.parseInt(jsonArticle.get("id").toString());
+			articleId = jsonArticle.get("id").toString();
 			idUser = Integer.parseInt(parseStringFromJson(jsonArticle,"id_user","0"));
 			titleText = parseStringFromJson(jsonArticle,"title","").replaceAll("\\\\","");
 			category = parseStringFromJson(jsonArticle,"category","").replaceAll("\\\\","");
