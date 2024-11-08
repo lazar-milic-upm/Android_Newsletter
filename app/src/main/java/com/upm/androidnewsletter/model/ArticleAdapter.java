@@ -38,7 +38,7 @@ public class ArticleAdapter extends ArrayAdapter<Article> {
             TextView abstractTextView = view.findViewById(R.id.textViewAbstract);
 
             titleTextView.setText(article.getTitleText());
-            abstractTextView.setText(article.getAbstractText()); // Or any other field you want to display
+            abstractTextView.setText(article.getAbstractText().replaceAll("<[^>]*>", ""));
         }
 
         return view;

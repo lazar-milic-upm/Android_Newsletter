@@ -48,8 +48,6 @@ public class ShowArticlesActivity extends AppCompatActivity {
             if(selectedArticle != null) {
                 intent.putExtra("id", String.valueOf(selectedArticle.getId()));
             }
-            else
-                System.out.println("PROBLEMI");
 
             startActivity(intent);
         });
@@ -81,7 +79,7 @@ public class ShowArticlesActivity extends AppCompatActivity {
         protected List<Article> doInBackground(Void... voids) {
             try {
                 // Fetch articles from the server
-                return modelManager.getArticles(10, 2);
+                return modelManager.getArticles();
             } catch (ServerCommunicationError e) {
                 errorMessage = e.getMessage(); // Server-specific error
                 return null;

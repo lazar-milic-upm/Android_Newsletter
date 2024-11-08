@@ -37,7 +37,7 @@ public class Image extends ModelEntity{
 	 * @param jsonImage
 	 */
 	@SuppressWarnings("unchecked")
-	protected Image(ModelManager mm,JSONObject jsonImage){
+    public Image(ModelManager mm, JSONObject jsonImage){
 		super(mm);
 		try{
 			id = Integer.parseInt(jsonImage.get("id").toString());

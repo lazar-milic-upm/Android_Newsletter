@@ -2,13 +2,17 @@ package com.upm.androidnewsletter.activities;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.TypedValue;
 import android.view.View;
+import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -18,19 +22,23 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.upm.androidnewsletter.R;
 import com.upm.androidnewsletter.exceptions.ServerCommunicationError;
 import com.upm.androidnewsletter.model.Article;
+import com.upm.androidnewsletter.model.Image;
 import com.upm.androidnewsletter.model.ModelManager;
 import com.upm.androidnewsletter.model.Utils;
+import com.upm.androidnewsletter.model.json.JSONObject;
 
 import java.io.IOException;
 
 public class ArticleDetailActivity extends AppCompatActivity {
 
     private static final int PICK_IMAGE_REQUEST = 1;
-    private TextView textViewTitle, textViewAbstract, textViewBody;
+    private TextView textViewTitle, textViewAbstract;
+    private WebView webViewBody;
     private ImageView imageViewArticle;
     private Button buttonUploadImage;
-    private Article article;
+    private Article articleToDisplay;
     private ModelManager modelManager;
+    private ProgressBar loadingIndicator;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,14 +46,16 @@ public class ArticleDetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_article_detail);
         textViewTitle = findViewById(R.id.textViewTitle);
         textViewAbstract = findViewById(R.id.textViewAbstract);
-        textViewBody = findViewById(R.id.textViewBody);
-        buttonUploadImage = findViewById(R.id.buttonUploadImage);
+        webViewBody = findViewById(R.id.webViewBody);
         imageViewArticle = findViewById(R.id.imageViewArticle);
+        buttonUploadImage = findViewById(R.id.buttonUploadImage);
+
+        imageViewArticle = findViewById(R.id.imageViewArticle);
+        loadingIndicator = findViewById(R.id.loading_indicator);
+        loadingIndicator.setVisibility(View.VISIBLE);
         Intent intent = getIntent();
         int articleId = Integer.parseInt(intent.getStringExtra("id"));
-
         modelManager = LoginActivity.getModelManager();
-
         new GetArticleTask().execute(articleId);
 
         buttonUploadImage.setOnClickListener(new View.OnClickListener() {
@@ -54,16 +64,6 @@ public class ArticleDetailActivity extends AppCompatActivity {
                 openImageChooser();
             }
         });
-    }
-
-    private void displayArticleDetails() {
-        if (article != null) {
-            textViewTitle.setText(article.getTitleText());
-            textViewAbstract.setText(article.getAbstractText());
-            textViewBody.setText(article.getBodyText());
-            // Load article image if available
-            // imageViewArticle.setImageBitmap(article.getImage().getBitmap()); // Update with actual loading logic
-        }
     }
 
     private void openImageChooser() {
@@ -93,10 +93,16 @@ public class ArticleDetailActivity extends AppCompatActivity {
         @Override
         protected Boolean doInBackground(Bitmap... bitmaps) {
             try {
-                // Convert bitmap to Base64
                 String base64Image = Utils.imgToBase64String(bitmaps[0]);
-                // Upload image using modelManager
-                modelManager.uploadImage(base64Image);
+                JSONObject jsonImage = new JSONObject();
+                jsonImage.put("id", -1);
+                jsonImage.put("id_article", articleToDisplay.getId());
+                jsonImage.put("order", "0");
+                jsonImage.put("description", "User uploaded image");
+                jsonImage.put("data", Utils.createScaledStrImage(base64Image,250,250));
+                Image imageToUpload = new Image(modelManager, jsonImage);
+
+                modelManager.save(imageToUpload);
                 return true;
             } catch (ServerCommunicationError e) {
                 e.printStackTrace();
@@ -131,12 +137,28 @@ public class ArticleDetailActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Article article) {
             if (article != null) {
-
-                textViewTitle.setText(article.getTitleText());
-                textViewAbstract.setText(article.getAbstractText());
-                textViewBody.setText(article.getBodyText());
                 try {
+                    textViewTitle.setText(article.getTitleText());
+
+                    textViewAbstract.setText(article.getAbstractText());
+                    webViewBody.loadDataWithBaseURL(null, article.getBodyText(), "text/html", "UTF-8", null);
                     imageViewArticle.setImageBitmap(article.getImage().getBitmapImage());
+
+                    loadingIndicator.setVisibility(View.GONE);
+                    textViewTitle.setVisibility(View.VISIBLE);
+                    textViewAbstract.setVisibility(View.VISIBLE);
+                    webViewBody.setVisibility(View.VISIBLE);
+                    imageViewArticle.setVisibility(View.VISIBLE);
+
+                    buttonUploadImage.setVisibility(View.VISIBLE);
+
+                    articleToDisplay = article;
+
+                    try {
+                        imageViewArticle.setImageBitmap(article.getImage().getBitmapImage());
+                    } catch (ServerCommunicationError e) {
+                        throw new RuntimeException(e);
+                    }
                 } catch (ServerCommunicationError e) {
                     throw new RuntimeException(e);
                 }

@@ -403,51 +403,39 @@ public class ModelManager {
 	}
 
 	private int saveImage(Image i) throws ServerCommunicationError {
-		try {
-			// Convert the image to a Base64 string (assuming Image class has a getImageBitmap() method to get a Bitmap)
-			String base64Image = Utils.imgToBase64String(i.getBitmapImage());
-
-			// Prepare the JSON payload
-			String parameters = "{ \"image\": \"" + base64Image + "\" }";  // JSON format with Base64 image
-
-			// Set the request URL
+		try{
+			String parameters =  "";
 			String request = serviceUrl + "article/image";
+
 			URL url = new URL(request);
 			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-
-			if (requireSelfSigned) {
+			if(requireSelfSigned)
 				TrustModifier.relaxHostChecking(connection);
-			}
-
-			// Set HTTP request properties
 			connection.setDoOutput(true);
 			connection.setDoInput(true);
 			connection.setInstanceFollowRedirects(false);
 			connection.setRequestMethod("POST");
-			connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+			connection.setRequestProperty("Content-Type","application/json; charset=UTF-8");
 			connection.setRequestProperty("Authorization", getAuthTokenHeader());
 			connection.setRequestProperty("charset", "utf-8");
-			connection.setUseCaches(false);
+			connection.setUseCaches (false);
 
-			// Write JSON data to the request
-			try (OutputStream os = connection.getOutputStream()) {
-				byte[] input = parameters.getBytes("utf-8");
-				os.write(input, 0, input.length);
-			}
+			writeJSONParams(connection, i.toJSON());
 
-			// Get HTTP response code
-			int httpResult = connection.getResponseCode();
-			if (httpResult == HttpURLConnection.HTTP_OK) {
+			int HttpResult =connection.getResponseCode();
+			if(HttpResult ==HttpURLConnection.HTTP_OK){
 				String res = parseHttpStreamResult(connection);
+				//Logger.log (Logger.INFO, res);
+				// get id from status ok when saved
 				int id = readRestResultFromInsert(res);
-				Logger.log(Logger.INFO, "Image saved with ID: " + id);
+				Logger.log(Logger.INFO, "Object image saved with id:" + id);
 				return id;
-			} else {
+			}else{
 				throw new ServerCommunicationError(connection.getResponseMessage());
 			}
 		} catch (Exception e) {
-			Logger.log(Logger.ERROR, "Error saving image [" + i + "]: " + e.getClass() + " (" + e.getMessage() + ")");
-			throw new ServerCommunicationError(e.getClass() + " (" + e.getMessage() + ")");
+			Logger.log(Logger.ERROR,"Saving image ["+i+"] : " + e.getClass() + " ( "+e.getMessage() + ")");
+			throw new ServerCommunicationError(e.getClass() + " ( "+e.getMessage() + ")");
 		}
 	}
 
@@ -483,40 +471,7 @@ public class ModelManager {
 		}  
 	}
 
-	public void uploadImage(String base64Image) throws ServerCommunicationError {
-		try {
-			// Create URL for uploading the image
-			String request = serviceUrl + "uploadImage"; // Ensure you have the correct endpoint for uploading
-			URL url = new URL(request);
-			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-
-			// Set HTTP method and headers
-			connection.setDoOutput(true);
-			connection.setRequestMethod("POST");
-			connection.setRequestProperty("Authorization", getAuthTokenHeader());
-			connection.setRequestProperty("Content-Type", "application/json");  // We're sending JSON now
-
-			// Prepare the image data (base64) for upload
-			String jsonData = "{ \"image\": \"" + base64Image + "\" }";
-
-			// Write the JSON data to the output stream
-			DataOutputStream outStream = new DataOutputStream(connection.getOutputStream());
-			outStream.writeBytes(jsonData);
-			outStream.flush();
-			outStream.close();
-
-			// Handle server response
-			int responseCode = connection.getResponseCode();
-			if (responseCode != HttpURLConnection.HTTP_OK) {
-				throw new ServerCommunicationError("Failed to upload image: " + connection.getResponseMessage());
-			}
-
-		} catch (IOException e) {
-			throw new ServerCommunicationError("Error uploading image: " + e.getMessage());
-		}
-	}
-
-	protected int save(ModelEntity o) throws ServerCommunicationError{
+	public int save(ModelEntity o) throws ServerCommunicationError{
 		int returnedId = -1;
 		if (o instanceof Image){
 			returnedId = saveImage((Image)o);
