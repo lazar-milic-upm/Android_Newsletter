@@ -28,7 +28,7 @@ public class Image extends ModelEntity{
 		this.order = order;
 		this.description = description;
 		this.idArticle=idArticle;
-		this.image = Utils.createScaledStrImage(b64Image,500,500);
+		this.image = Utils.createScaledStrImage(b64Image,1000,750);
 	}
 	
 	/**

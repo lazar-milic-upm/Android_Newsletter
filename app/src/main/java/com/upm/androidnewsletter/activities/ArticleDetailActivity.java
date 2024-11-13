@@ -2,11 +2,13 @@ package com.upm.androidnewsletter.activities;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.text.Html;
 import android.util.TypedValue;
 import android.view.View;
 import android.webkit.WebView;
@@ -18,6 +20,7 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import com.upm.androidnewsletter.R;
 import com.upm.androidnewsletter.exceptions.ServerCommunicationError;
@@ -39,23 +42,30 @@ public class ArticleDetailActivity extends AppCompatActivity {
     private Article articleToDisplay;
     private ModelManager modelManager;
     private ProgressBar loadingIndicator;
+    private int articleId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Intent intent = getIntent();
         setContentView(R.layout.activity_article_detail);
         textViewTitle = findViewById(R.id.textViewTitle);
         textViewAbstract = findViewById(R.id.textViewAbstract);
         webViewBody = findViewById(R.id.webViewBody);
         imageViewArticle = findViewById(R.id.imageViewArticle);
         buttonUploadImage = findViewById(R.id.buttonUploadImage);
-
-        imageViewArticle = findViewById(R.id.imageViewArticle);
         loadingIndicator = findViewById(R.id.loading_indicator);
         loadingIndicator.setVisibility(View.VISIBLE);
-        Intent intent = getIntent();
-        int articleId = Integer.parseInt(intent.getStringExtra("id"));
         modelManager = LoginActivity.getModelManager();
+        articleId = Integer.parseInt(intent.getStringExtra("id"));
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+        }
+
         new GetArticleTask().execute(articleId);
 
         buttonUploadImage.setOnClickListener(new View.OnClickListener() {
@@ -64,6 +74,13 @@ public class ArticleDetailActivity extends AppCompatActivity {
                 openImageChooser();
             }
         });
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        // Navigate back to the previous activity
+        onBackPressed();
+        return true;
     }
 
     private void openImageChooser() {
@@ -82,6 +99,14 @@ public class ArticleDetailActivity extends AppCompatActivity {
                 Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
                 imageViewArticle.setImageBitmap(bitmap); // Display the selected image
                 new UploadImageTask().execute(bitmap);
+                loadingIndicator.setVisibility(View.VISIBLE);
+                textViewTitle.setVisibility(View.GONE);
+                textViewAbstract.setVisibility(View.GONE);
+                webViewBody.setVisibility(View.GONE);
+                imageViewArticle.setVisibility(View.GONE);
+                buttonUploadImage.setVisibility(View.GONE);
+                Toast.makeText(ArticleDetailActivity.this, "Image is being uploaded...", Toast.LENGTH_SHORT).show();
+                new GetArticleTask().execute(articleId);
             } catch (IOException e) {
                 e.printStackTrace();
                 Toast.makeText(this, "Failed to load image", Toast.LENGTH_SHORT).show();
@@ -99,9 +124,8 @@ public class ArticleDetailActivity extends AppCompatActivity {
                 jsonImage.put("id_article", articleToDisplay.getId());
                 jsonImage.put("order", "0");
                 jsonImage.put("description", "User uploaded image");
-                jsonImage.put("data", Utils.createScaledStrImage(base64Image,250,250));
+                jsonImage.put("data", Utils.createScaledStrImage(base64Image,1000,750));
                 Image imageToUpload = new Image(modelManager, jsonImage);
-
                 modelManager.save(imageToUpload);
                 return true;
             } catch (ServerCommunicationError e) {
@@ -113,7 +137,7 @@ public class ArticleDetailActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Boolean success) {
             if (success) {
-                Toast.makeText(ArticleDetailActivity.this, "Image uploaded successfully", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ArticleDetailActivity.this, "Image uploaded successfully! The article will be refreshed!", Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(ArticleDetailActivity.this, "Image upload failed", Toast.LENGTH_SHORT).show();
             }
@@ -138,10 +162,10 @@ public class ArticleDetailActivity extends AppCompatActivity {
         protected void onPostExecute(Article article) {
             if (article != null) {
                 try {
-                    textViewTitle.setText(article.getTitleText());
-
-                    textViewAbstract.setText(article.getAbstractText());
+                    textViewTitle.setText(Html.fromHtml(article.getTitleText()));
+                    textViewAbstract.setText(Html.fromHtml(article.getAbstractText()));
                     webViewBody.loadDataWithBaseURL(null, article.getBodyText(), "text/html", "UTF-8", null);
+                    webViewBody.setBackgroundColor(Color.parseColor("#FAFAFA"));
                     imageViewArticle.setImageBitmap(article.getImage().getBitmapImage());
 
                     loadingIndicator.setVisibility(View.GONE);
@@ -149,16 +173,9 @@ public class ArticleDetailActivity extends AppCompatActivity {
                     textViewAbstract.setVisibility(View.VISIBLE);
                     webViewBody.setVisibility(View.VISIBLE);
                     imageViewArticle.setVisibility(View.VISIBLE);
-
                     buttonUploadImage.setVisibility(View.VISIBLE);
 
                     articleToDisplay = article;
-
-                    try {
-                        imageViewArticle.setImageBitmap(article.getImage().getBitmapImage());
-                    } catch (ServerCommunicationError e) {
-                        throw new RuntimeException(e);
-                    }
                 } catch (ServerCommunicationError e) {
                     throw new RuntimeException(e);
                 }

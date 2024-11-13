@@ -3,6 +3,7 @@
     <style name="Base.Theme.AndroidNewsletter" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <item name="colorControlNormal">#FFFFFF</item>
     </style>
 
     <style name="Theme.AndroidNewsletter" parent="Base.Theme.AndroidNewsletter" />

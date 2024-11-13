@@ -11,6 +11,10 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <include
+            android:id="@+id/toolbar"
+            layout="@layout/toolbar" />
+
         <ProgressBar
             android:id="@+id/loading_indicator"
             android:layout_width="wrap_content"
@@ -29,14 +33,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
-            android:layout_marginTop="32dp"
+            android:layout_marginTop="48dp"
             android:paddingHorizontal="16dp"
             android:textAlignment="center"
             android:visibility="gone"
             app:layout_constraintBottom_toTopOf="@+id/textViewAbstract"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@+id/toolbar" />
 
         <TextView
             android:id="@+id/textViewAbstract"
@@ -55,9 +59,8 @@
         <ImageView
             android:id="@+id/imageViewArticle"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_margin="16dp"
-            android:layout_marginTop="100dp"
             android:visibility="gone"
             app:layout_constraintBottom_toTopOf="@id/webViewBody"
             app:layout_constraintEnd_toEndOf="parent"
@@ -66,10 +69,10 @@
 
         <WebView
             android:id="@+id/webViewBody"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="16dp"
-            android:layout_marginTop="48dp"
+            android:layout_marginHorizontal="8dp"
+            android:layout_marginBottom="12dp"
             android:visibility="gone"
             app:layout_constraintBottom_toTopOf="@id/buttonUploadImage"
             app:layout_constraintEnd_toEndOf="parent"

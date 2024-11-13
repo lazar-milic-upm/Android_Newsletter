@@ -11,6 +11,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import com.upm.androidnewsletter.R;
 import com.upm.androidnewsletter.exceptions.AuthenticationError;
@@ -25,6 +26,7 @@ public class LoginActivity extends AppCompatActivity {
     private Button loginButton;
     private SharedPreferences sharedPreferences;
     private static ModelManager modelManager;
+    private String usernameString;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +37,8 @@ public class LoginActivity extends AppCompatActivity {
         usernameEditText = findViewById(R.id.main_username);
         passwordEditText = findViewById(R.id.main_password);
         loginButton = findViewById(R.id.main_btn_log_in);
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
         // SharedPreferences to save API key
         sharedPreferences = getSharedPreferences("LoginPrefs", MODE_PRIVATE);
@@ -54,6 +58,7 @@ public class LoginActivity extends AppCompatActivity {
         // Login button
         loginButton.setOnClickListener(view -> {
             String username = "DEV_TEAM_09";//usernameEditText.getText().toString();
+            usernameString = username;
             String password = "123456@09";//passwordEditText.getText().toString();
             new LoginTask().execute(username, password);
         });
@@ -87,7 +92,7 @@ public class LoginActivity extends AppCompatActivity {
                 editor.putString("apikey", modelManager.getAuthTokenHeader());
                 editor.apply();
 
-                Toast.makeText(LoginActivity.this, "Login successful!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(LoginActivity.this, "Login successful! \nWelcome " + usernameString + "!" , Toast.LENGTH_SHORT).show();
 
                 // Go to MainActivity
                 Intent intent = new Intent(LoginActivity.this, ShowArticlesActivity.class);

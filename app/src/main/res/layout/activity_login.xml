@@ -5,7 +5,11 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activities.LoginActivity">
+    tools:context=".activities.LoginActivity"
+    android:theme="@style/Theme.AndroidNewsletter">
+    <include
+        android:id="@+id/toolbar"
+        layout="@layout/toolbar" />
 
     <EditText
         android:id="@+id/main_password"

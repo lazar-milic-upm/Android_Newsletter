@@ -3,4 +3,7 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="gray">#010101</color>
+    <color name="primaryColor">#6750A4</color>
+    <drawable name="transperent_color">#00000000</drawable>
+
 </resources>

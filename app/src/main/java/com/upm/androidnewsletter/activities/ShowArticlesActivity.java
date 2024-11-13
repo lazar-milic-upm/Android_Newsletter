@@ -9,10 +9,12 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import com.upm.androidnewsletter.R;
 import com.upm.androidnewsletter.exceptions.ServerCommunicationError;
@@ -28,6 +30,7 @@ public class ShowArticlesActivity extends AppCompatActivity {
     private ModelManager modelManager;
     private ListView listViewArticles;
     private ArticleAdapter articleAdapter;
+    private ProgressBar loadingIndicator;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,22 +40,11 @@ public class ShowArticlesActivity extends AppCompatActivity {
 
         modelManager = LoginActivity.getModelManager();
         listViewArticles = findViewById(R.id.listViewArticles);
+        loadingIndicator = findViewById(R.id.progressBarLoading);
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
-        listViewArticles.setOnItemClickListener((parent, view, position, id) -> {
-            // Get the clicked article
-            Article selectedArticle = articleAdapter.getItem(position);
-
-            // Create an intent to start the detail activity
-            Intent intent = new Intent(ShowArticlesActivity.this, ArticleDetailActivity.class);
-
-            if(selectedArticle != null) {
-                intent.putExtra("id", String.valueOf(selectedArticle.getId()));
-            }
-
-            startActivity(intent);
-        });
-
-        fetchArticlesIfConnected(); // Check network before fetching articles
+        fetchArticlesIfConnected();
     }
 
     // Method to check network connectivity
@@ -66,6 +58,7 @@ public class ShowArticlesActivity extends AppCompatActivity {
     // Trigger article fetch if network is available
     private void fetchArticlesIfConnected() {
         if (isNetworkAvailable()) {
+
             new FetchArticlesTask().execute();
         } else {
             Toast.makeText(this, "No internet connection available.", Toast.LENGTH_SHORT).show();
@@ -95,6 +88,17 @@ public class ShowArticlesActivity extends AppCompatActivity {
                 // Set up the adapter with the fetched articles
                 articleAdapter = new ArticleAdapter(ShowArticlesActivity.this, R.layout.item_article, articles);
                 listViewArticles.setAdapter(articleAdapter);
+                loadingIndicator.setVisibility(View.GONE);
+                listViewArticles.setVisibility(View.VISIBLE);
+
+                listViewArticles.setOnItemClickListener((parent, view, position, id) -> {
+                    Article selectedArticle = articleAdapter.getItem(position);
+                    if (selectedArticle != null) {
+                        Intent intent = new Intent(ShowArticlesActivity.this, ArticleDetailActivity.class);
+                        intent.putExtra("id", String.valueOf(selectedArticle.getId()));
+                        startActivity(intent);
+                    }
+                });
             } else {
                 Toast.makeText(ShowArticlesActivity.this, "Failed to fetch articles: " + errorMessage, Toast.LENGTH_LONG).show();
             }
