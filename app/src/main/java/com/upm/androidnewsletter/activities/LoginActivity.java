@@ -57,9 +57,9 @@ public class LoginActivity extends AppCompatActivity {
 
         // Login button
         loginButton.setOnClickListener(view -> {
-            String username = "DEV_TEAM_09";//usernameEditText.getText().toString();
+            String username = usernameEditText.getText().toString();
             usernameString = username;
-            String password = "123456@09";//passwordEditText.getText().toString();
+            String password = passwordEditText.getText().toString();
             new LoginTask().execute(username, password);
         });
     }
@@ -92,7 +92,7 @@ public class LoginActivity extends AppCompatActivity {
                 editor.putString("apikey", modelManager.getAuthTokenHeader());
                 editor.apply();
 
-                Toast.makeText(LoginActivity.this, "Login successful! \nWelcome " + usernameString + "!" , Toast.LENGTH_SHORT).show();
+                Toast.makeText(LoginActivity.this, "Login successful! \nWelcome " + usernameString + "!" , Toast.LENGTH_LONG).show();
 
                 // Go to MainActivity
                 Intent intent = new Intent(LoginActivity.this, ShowArticlesActivity.class);
