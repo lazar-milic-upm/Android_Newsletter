@@ -11,7 +11,10 @@
     <include
         android:id="@+id/toolbar"
         layout="@layout/toolbar"
-        />
+        app:layout_constraintBottom_toTopOf="@id/textViewTitle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/textViewTitle"
@@ -19,7 +22,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:layout_marginBottom="8dp"
-        android:text="Articles"
+        android:text="Latest News"
         android:textAlignment="center"
         android:textColor="@color/black"
         android:textSize="24sp"
@@ -33,7 +36,7 @@
         android:id="@+id/progressBarLoading"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="50dp"
         android:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -41,6 +44,7 @@
 
     <ListView
         android:id="@+id/listViewArticles"
+        android:layout_weight="1"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginHorizontal="8dp"
@@ -48,11 +52,23 @@
         android:layout_marginTop="24dp"
         android:divider="@drawable/transperent_color"
         android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/logout_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/progressBarLoading"
         android:focusable="false"
         android:focusableInTouchMode="false"/>
+
+    <Button
+        android:id="@+id/logout_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="logout"
+        android:text="Logout"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/listViewArticles" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

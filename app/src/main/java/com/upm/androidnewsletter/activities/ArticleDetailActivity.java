@@ -1,6 +1,8 @@
 package com.upm.androidnewsletter.activities;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -10,11 +12,14 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.Html;
 import android.util.TypedValue;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -43,6 +48,7 @@ public class ArticleDetailActivity extends AppCompatActivity {
     private ModelManager modelManager;
     private ProgressBar loadingIndicator;
     private int articleId;
+    private ScrollView scrollView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,7 +84,6 @@ public class ArticleDetailActivity extends AppCompatActivity {
 
     @Override
     public boolean onSupportNavigateUp() {
-        // Navigate back to the previous activity
         onBackPressed();
         return true;
     }
@@ -152,7 +157,6 @@ public class ArticleDetailActivity extends AppCompatActivity {
             try {
                 return modelManager.getArticle(articleId);
             } catch (ServerCommunicationError e) {
-                // Handle the error, e.g., log it or display an error message
                 e.printStackTrace();
                 return null;
             }
@@ -167,20 +171,48 @@ public class ArticleDetailActivity extends AppCompatActivity {
                     webViewBody.loadDataWithBaseURL(null, article.getBodyText(), "text/html", "UTF-8", null);
                     webViewBody.setBackgroundColor(Color.parseColor("#FAFAFA"));
                     imageViewArticle.setImageBitmap(article.getImage().getBitmapImage());
-
                     loadingIndicator.setVisibility(View.GONE);
                     textViewTitle.setVisibility(View.VISIBLE);
                     textViewAbstract.setVisibility(View.VISIBLE);
                     webViewBody.setVisibility(View.VISIBLE);
                     imageViewArticle.setVisibility(View.VISIBLE);
                     buttonUploadImage.setVisibility(View.VISIBLE);
-
+                    scrollView = findViewById(R.id.scrollViewArticleDetail);
+                    scrollView.smoothScrollTo(0,0);
                     articleToDisplay = article;
                 } catch (ServerCommunicationError e) {
                     throw new RuntimeException(e);
                 }
             }
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.toolbar_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.action_logout) {
+            logout();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void logout() {
+        SharedPreferences sharedPreferences = getSharedPreferences("user_prefs", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.clear();
+        editor.apply();
+
+        Intent intent = new Intent(this, LoginActivity.class);
+        startActivity(intent);
+        finish();
     }
 }
 

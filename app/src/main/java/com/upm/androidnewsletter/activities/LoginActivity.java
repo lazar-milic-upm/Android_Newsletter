@@ -7,6 +7,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -27,6 +28,10 @@ public class LoginActivity extends AppCompatActivity {
     private SharedPreferences sharedPreferences;
     private static ModelManager modelManager;
     private String usernameString;
+    private CheckBox saveLoginCheckBox;
+    private SharedPreferences loginPreferences;
+    private SharedPreferences.Editor loginPrefsEditor;
+    private Boolean saveLogin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +42,9 @@ public class LoginActivity extends AppCompatActivity {
         usernameEditText = findViewById(R.id.main_username);
         passwordEditText = findViewById(R.id.main_password);
         loginButton = findViewById(R.id.main_btn_log_in);
+        saveLoginCheckBox = (CheckBox)findViewById(R.id.saveLoginCheckBox);
+        loginPreferences = getSharedPreferences("loginPrefs", MODE_PRIVATE);
+        loginPrefsEditor = loginPreferences.edit();
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -57,11 +65,28 @@ public class LoginActivity extends AppCompatActivity {
 
         // Login button
         loginButton.setOnClickListener(view -> {
+
+            if (saveLoginCheckBox.isChecked()) {
+                loginPrefsEditor.putBoolean("saveLogin", true);
+                loginPrefsEditor.putString("username", usernameEditText.getText().toString());
+                loginPrefsEditor.putString("password", passwordEditText.getText().toString());
+                loginPrefsEditor.commit();
+            } else {
+                loginPrefsEditor.clear();
+                loginPrefsEditor.commit();
+            }
             String username = usernameEditText.getText().toString();
             usernameString = username;
             String password = passwordEditText.getText().toString();
             new LoginTask().execute(username, password);
         });
+
+        saveLogin = loginPreferences.getBoolean("saveLogin", false);
+        if (saveLogin == true) {
+            usernameEditText.setText(loginPreferences.getString("username", ""));
+            passwordEditText.setText(loginPreferences.getString("password", ""));
+            saveLoginCheckBox.setChecked(true);
+        }
     }
 
     public static ModelManager getModelManager() {
