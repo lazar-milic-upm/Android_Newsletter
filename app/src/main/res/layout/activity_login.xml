@@ -19,6 +19,7 @@
         app:backgroundTint="@color/primaryColor"
         android:ems="10"
         android:hint="Password"
+        android:autofillHints="password"
         android:inputType="textPassword"
         android:textColorHighlight="@color/primaryColor"
         app:layout_constraintEnd_toEndOf="parent"
@@ -34,6 +35,7 @@
         android:ems="10"
         android:hint="Username"
         android:inputType="text"
+        android:autofillHints="username"
         android:textColorHighlight="@color/primaryColor"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -61,7 +63,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/toolbar"
-        app:srcCompat="@drawable/newsletter" />
+        app:srcCompat="@drawable/newsletter"
+        android:contentDescription="Newsletter logo"/>
 
     <CheckBox
         android:id="@+id/saveLoginCheckBox"

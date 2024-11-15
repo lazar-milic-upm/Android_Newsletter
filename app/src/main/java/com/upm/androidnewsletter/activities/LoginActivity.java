@@ -10,14 +10,11 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-
 import com.upm.androidnewsletter.R;
 import com.upm.androidnewsletter.exceptions.AuthenticationError;
 import com.upm.androidnewsletter.model.ModelManager;
-
 import java.util.Properties;
 
 public class LoginActivity extends AppCompatActivity {
@@ -25,7 +22,6 @@ public class LoginActivity extends AppCompatActivity {
     private EditText usernameEditText;
     private EditText passwordEditText;
     private Button loginButton;
-    private SharedPreferences sharedPreferences;
     private static ModelManager modelManager;
     private String usernameString;
     private CheckBox saveLoginCheckBox;
@@ -37,19 +33,14 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-
-        // components
         usernameEditText = findViewById(R.id.main_username);
         passwordEditText = findViewById(R.id.main_password);
         loginButton = findViewById(R.id.main_btn_log_in);
-        saveLoginCheckBox = (CheckBox)findViewById(R.id.saveLoginCheckBox);
+        saveLoginCheckBox = findViewById(R.id.saveLoginCheckBox);
         loginPreferences = getSharedPreferences("loginPrefs", MODE_PRIVATE);
         loginPrefsEditor = loginPreferences.edit();
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        // SharedPreferences to save API key
-        sharedPreferences = getSharedPreferences("LoginPrefs", MODE_PRIVATE);
 
         if (modelManager == null) {
             Properties prop = new Properties();
@@ -59,13 +50,11 @@ public class LoginActivity extends AppCompatActivity {
             try {
                 modelManager = new ModelManager(prop);
             } catch (Exception e) {
-                Log.e("LoginActivity", "Authentication failed: " + e.toString());
+                Log.e("LoginActivity", "Authentication failed: " + e);
             }
         }
 
-        // Login button
         loginButton.setOnClickListener(view -> {
-
             if (saveLoginCheckBox.isChecked()) {
                 loginPrefsEditor.putBoolean("saveLogin", true);
                 loginPrefsEditor.putString("username", usernameEditText.getText().toString());
@@ -82,7 +71,7 @@ public class LoginActivity extends AppCompatActivity {
         });
 
         saveLogin = loginPreferences.getBoolean("saveLogin", false);
-        if (saveLogin == true) {
+        if (saveLogin) {
             usernameEditText.setText(loginPreferences.getString("username", ""));
             passwordEditText.setText(loginPreferences.getString("password", ""));
             saveLoginCheckBox.setChecked(true);
@@ -96,7 +85,6 @@ public class LoginActivity extends AppCompatActivity {
     private class LoginTask extends AsyncTask<String, Void, Boolean> {
         private String errorMessage = "";
 
-        @Override
         protected Boolean doInBackground(String... params) {
             String username = params[0];
             String password = params[1];
@@ -109,7 +97,6 @@ public class LoginActivity extends AppCompatActivity {
             }
         }
 
-        @Override
         protected void onPostExecute(Boolean success) {
             if (success) {
                 SharedPreferences prefs = getSharedPreferences("user_prefs", Context.MODE_PRIVATE);
@@ -119,7 +106,6 @@ public class LoginActivity extends AppCompatActivity {
 
                 Toast.makeText(LoginActivity.this, "Login successful! \nWelcome " + usernameString + "!" , Toast.LENGTH_LONG).show();
 
-                // Go to MainActivity
                 Intent intent = new Intent(LoginActivity.this, ShowArticlesActivity.class);
                 startActivity(intent);
                 finish();
